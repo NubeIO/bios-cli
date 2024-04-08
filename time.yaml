@@ -1,0 +1,16 @@
+shell: bash
+name: test flow document
+description: This is just a very simple example
+
+args:
+  - name
+  - desc
+
+steps:
+  - name: create and move systemd service file
+    cmd: time
+  - name: list files
+    cmd: dirs
+    params:
+      - "listfiles"
+      - "./"

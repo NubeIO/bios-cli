@@ -46,16 +46,19 @@ func main() {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				return
 			}
-			for _, step := range buildYAML.Steps {
+			resp := make(map[string]interface{})
+			for i, step := range buildYAML.Steps {
 				params := replaceParams(step.Params, buildYAML.Vars, request.Args)
 				fmt.Println("params", params)
-				if _, err := bt.ExecuteStep(commander.BuildStep{Name: step.Name, Cmd: step.Cmd, Params: params}); err != nil {
+				if ret, err := bt.ExecuteStep(commander.BuildStep{Name: step.Name, Cmd: step.Cmd, Params: params}); err != nil {
 					c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 					return
+				} else {
+					resp[fmt.Sprintf("%s_%d", step.Cmd, i)] = ret
 				}
 			}
 
-			c.JSON(http.StatusOK, gin.H{"message": "Build steps executed successfully"})
+			c.JSON(http.StatusOK, gin.H{"message": resp})
 		})
 
 		// Run the server

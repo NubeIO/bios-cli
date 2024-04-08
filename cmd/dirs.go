@@ -134,6 +134,7 @@ func (bt *BuildTool) handleFiles(params interface{}) (interface{}, error) {
 			return nil, fmt.Errorf("failed to list files in %s: %v", filePath, err)
 		}
 		fmt.Println("Files in directory:", files)
+		return files, nil
 
 	default:
 		return nil, fmt.Errorf("unsupported file operation: %s", operation)

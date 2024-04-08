@@ -37,6 +37,7 @@ func NewBuildTool() *BuildTool {
 		"github-download": bt.handleGitHubDownload,
 		"dirs":            bt.handleFiles,
 		"systemctl-file":  bt.handleSystemctlFile,
+		"time":            bt.time,
 	}
 	bt.Commands["listCommands"] = Command{Func: bt.handleListCommands, Name: "listCommands", Help: "List all available commands"}
 	bt.Commands["systemctl"] = Command{Func: bt.handleSystemctl, Name: "systemctl", Help: "Manage systemd services"}
@@ -46,6 +47,7 @@ func NewBuildTool() *BuildTool {
 	bt.Commands["dirs"] = Command{Func: bt.handleFiles, Name: "dirs", Help: "Add/Edit files and dirs"}
 	bt.Commands["dirs"] = Command{Func: bt.handleFiles, Name: "dirs", Help: "Add/Edit files and dirs"}
 	bt.Commands["systemctl-file"] = Command{Func: bt.handleFiles, Name: "dirs", Help: "Generates a systemctl file"}
+	bt.Commands["time"] = Command{Func: bt.time, Name: "dirs", Help: "Generates a systemctl file"}
 
 	return bt
 }

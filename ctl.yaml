@@ -16,7 +16,7 @@ steps:
       location: "./"
       ExecStart: "/path/to/executable"
       Restart: "always"
-  - name: move the file
+  - name: make a tmp dir
     cmd: dirs
     params:
       - "mkdir"

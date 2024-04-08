@@ -1,0 +1,42 @@
+shell: bash
+name: test flow document
+description: This is just a very simple example
+
+args:
+  - token
+  - owner
+  - repo
+  - tag
+  - arch
+  - location
+  - zipName
+
+vars:
+  - name: zipName # this var is update in the git download func, its used to save the zip name
+    value: ""
+
+steps:
+
+  - name: download a build
+    cmd: github-download
+    params:
+      owner: "${owner}"
+      repo: ros-bios
+      tag: latest
+      arch: "${arch}"
+      token: "${token}"
+      location: "${location}"
+
+  - name: unzip downloaded build
+    cmd: dirs
+    params:
+      - unzip
+      - "${zipName}"
+      - ./unzipped_build
+
+  - name: move unzipped build
+    cmd: dirs
+    params:
+      - mv
+      - ./unzipped_build
+      - ./final_destination
