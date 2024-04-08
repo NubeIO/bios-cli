@@ -1,0 +1,17 @@
+shell: bash
+name: test flow document
+description: This is just a very simple example
+
+steps:
+  - name: Make sample GET request
+    cmd: http
+    params:
+      method: GET
+      url: https://reqres.in/api/users
+      header:
+        my_header_1: value1
+        my_header_2: value2
+      auth:
+        basic:
+          username: username
+          password: password

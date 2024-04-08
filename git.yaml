@@ -1,0 +1,42 @@
+shell: bash
+name: test flow document
+description: This is just a very simple example
+
+args:
+  - token
+  - owner
+  - repo
+  - tag
+  - arch
+  - location
+  - zipName
+
+vars:
+  - name: zipName
+    value: ""
+
+steps:
+
+  - name: download a build
+    cmd: github-download
+    params:
+      owner: "${owner}"
+      repo: "${repo}"
+      tag: "${tag}"
+      arch: "${arch}"
+      token: "${token}"
+      location: "${location}"
+
+  - name: unzip downloaded build
+    cmd: dirs
+    params:
+      - unzip
+      - "${zipName}"
+      - ./unzipped_build
+
+  - name: move unzipped build
+    cmd: dirs
+    params:
+      - mv
+      - ./unzipped_build
+      - ./final_destination

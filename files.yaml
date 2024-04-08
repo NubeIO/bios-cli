@@ -1,0 +1,20 @@
+shell: bash
+name: test flow document
+description: This is just a very simple example
+
+args:
+  - MESSAGE
+  - MESSAGE2
+
+vars:
+  - name: var1
+    value: mosquitto
+  - name: var2
+    value: mosquitto1
+
+steps:
+  - name: list files
+    cmd: dirs
+    params:
+      - "delete"
+      - ""

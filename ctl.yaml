@@ -1,0 +1,29 @@
+shell: bash
+name: test flow document
+description: This is just a very simple example
+
+args:
+  - name
+  - desc
+
+steps:
+  - name: create and move systemd service file
+    cmd: systemctl-file
+    params:
+      name: "${name}"
+      description: "${desc}"
+      tmp: "./"
+      location: "./"
+      ExecStart: "/path/to/executable"
+      Restart: "always"
+  - name: move the file
+    cmd: dirs
+    params:
+      - "mkdir"
+      - "test"
+  - name: move the file
+    cmd: dirs
+    params:
+      - "mv"
+      - "${name}.service"
+      - "test/${name}.service"
