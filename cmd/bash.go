@@ -7,11 +7,11 @@ import (
 	"os/exec"
 )
 
-func (bt *BuildTool) handleRunBash(params interface{}) error {
+func (bt *BuildTool) handleRunBash(params interface{}) (interface{}, error) {
 	// Assert that params is a string
 	cmdString, ok := params.(string)
 	if !ok {
-		return errors.New("invalid params type for runBash command")
+		return nil, errors.New("invalid params type for runBash command")
 	}
 
 	cmd := exec.Command("bash", "-c", cmdString)
@@ -19,8 +19,8 @@ func (bt *BuildTool) handleRunBash(params interface{}) error {
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("failed to run bash command: %v", err)
+		return nil, fmt.Errorf("failed to run bash command: %v", err)
 	}
 
-	return nil
+	return nil, nil
 }

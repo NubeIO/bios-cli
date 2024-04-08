@@ -10,7 +10,7 @@ steps:
   - name: create and move systemd service file
     cmd: systemctl-file
     params:
-      name: "${name}"
+      name: "${name}" # this is the service name
       description: "${desc}"
       tmp: "./"
       location: "./"

@@ -12,7 +12,7 @@ args:
   - zipName
 
 vars:
-  - name: zipName
+  - name: zipName # this var is update in the git download func, its used to save the zip name
     value: ""
 
 steps:

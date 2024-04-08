@@ -11,11 +11,11 @@ import (
 	"strings"
 )
 
-func (bt *BuildTool) handleGitHubDownload(params interface{}) error {
+func (bt *BuildTool) handleGitHubDownload(params interface{}) (interface{}, error) {
 	// Convert params to a map[string]interface{}
 	paramMap, ok := params.(map[string]interface{})
 	if !ok {
-		return fmt.Errorf("invalid params for GitHub download")
+		return nil, fmt.Errorf("invalid params for GitHub download")
 	}
 
 	owner, _ := paramMap["owner"].(string)
@@ -35,19 +35,19 @@ func (bt *BuildTool) handleGitHubDownload(params interface{}) error {
 		SetHeader("Authorization", fmt.Sprintf("token %s", token)).
 		Get(fmt.Sprintf("https://api.github.com/repos/%s/%s/releases/tags/%s", owner, repo, tag))
 	if err != nil {
-		return fmt.Errorf("failed to get release information: %v", err)
+		return nil, fmt.Errorf("failed to get release information: %v", err)
 	}
 	fmt.Println("STATUS", resp.StatusCode())
 	if resp.StatusCode() > 300 {
 
-		return fmt.Errorf("http reponse: %v", resp.String())
+		return nil, fmt.Errorf("http reponse: %v", resp.String())
 	}
 
 	// Parse the release information to find the correct zip file based on architecture
 	var releaseInfo map[string]interface{}
 	err = json.Unmarshal(resp.Body(), &releaseInfo)
 	if err != nil {
-		return fmt.Errorf("failed to parse release information: %v", err)
+		return nil, fmt.Errorf("failed to parse release information: %v", err)
 	}
 
 	if assets, ok := releaseInfo["assets"].([]interface{}); ok {
@@ -62,19 +62,19 @@ func (bt *BuildTool) handleGitHubDownload(params interface{}) error {
 					SetOutput(zipFilePath).
 					Get(assetInfo["browser_download_url"].(string))
 				if err != nil {
-					return fmt.Errorf("failed to download release zip: %v", err)
+					return nil, fmt.Errorf("failed to download release zip: %v", err)
 				}
 				defer resp.RawResponse.Body.Close()
 				bt.UpdateVar("zipName", zipFilePath)
 				fmt.Printf("Release successfully downloaded to: %s\n", zipFilePath)
-				return nil
+				return nil, nil
 			}
 		}
 	} else {
 		fmt.Println("No assets found in the release information")
 	}
 
-	return fmt.Errorf("no matching zip file found for architecture: %s", arch)
+	return nil, fmt.Errorf("no matching zip file found for architecture: %s", arch)
 }
 
 func unzip(src, dest string) error {

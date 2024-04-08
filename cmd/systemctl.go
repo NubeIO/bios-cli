@@ -7,14 +7,14 @@ import (
 	"path/filepath"
 )
 
-func (bt *BuildTool) handleSystemctl(params interface{}) error {
-	return bt.executeCommand("systemctl", params)
+func (bt *BuildTool) handleSystemctl(params interface{}) (interface{}, error) {
+	return nil, bt.executeCommand("systemctl", params)
 }
 
-func (bt *BuildTool) handleSystemctlFile(params interface{}) error {
+func (bt *BuildTool) handleSystemctlFile(params interface{}) (interface{}, error) {
 	paramMap, ok := params.(map[string]interface{})
 	if !ok {
-		return fmt.Errorf("invalid params for systemctl-file")
+		return nil, fmt.Errorf("invalid params for systemctl-file")
 	}
 
 	name, _ := paramMap["name"].(string)
@@ -30,18 +30,18 @@ func (bt *BuildTool) handleSystemctlFile(params interface{}) error {
 	// Generate the service file
 	serviceFilePath, err := service.GenerateServiceFile(tmpPath)
 	if err != nil {
-		return fmt.Errorf("failed to generate systemctl service file: %v", err)
+		return nil, fmt.Errorf("failed to generate systemctl service file: %v", err)
 	}
 
 	// Move the service file to the specified location
 	err = MoveServiceFile(serviceFilePath, location)
 	if err != nil {
-		return fmt.Errorf("failed to move systemctl service file: %v", err)
+		return nil, fmt.Errorf("failed to move systemctl service file: %v", err)
 	}
 
 	fmt.Printf("Systemctl service file created and moved to: %s\n", filepath.Join(location, filepath.Base(serviceFilePath)))
 
-	return nil
+	return nil, nil
 }
 
 // SystemctlService represents a systemd service file.

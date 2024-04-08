@@ -49,7 +49,7 @@ func main() {
 			for _, step := range buildYAML.Steps {
 				params := replaceParams(step.Params, buildYAML.Vars, request.Args)
 				fmt.Println("params", params)
-				if err := bt.ExecuteStep(commander.BuildStep{Name: step.Name, Cmd: step.Cmd, Params: params}); err != nil {
+				if _, err := bt.ExecuteStep(commander.BuildStep{Name: step.Name, Cmd: step.Cmd, Params: params}); err != nil {
 					c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 					return
 				}
@@ -65,7 +65,7 @@ func main() {
 
 	} else if len(os.Args) < 3 {
 		fmt.Println("Usage: build-tool build build.yaml MESSAGE=hello-world")
-		err := bt.ExecuteStep(commander.BuildStep{Name: "listCommands", Cmd: "listCommands", Params: nil})
+		_, err := bt.ExecuteStep(commander.BuildStep{Name: "listCommands", Cmd: "listCommands", Params: nil})
 		if err != nil {
 			log.Fatalf("Error executing command listCommands: %v", err)
 
@@ -75,7 +75,7 @@ func main() {
 
 	command := os.Args[2]
 	if command == "listCommands" {
-		err := bt.ExecuteStep(commander.BuildStep{Name: "listCommands", Cmd: "listCommands", Params: nil})
+		_, err := bt.ExecuteStep(commander.BuildStep{Name: "listCommands", Cmd: "listCommands", Params: nil})
 		if err != nil {
 			log.Fatalf("Error executing command listCommands: %v", err)
 		}
@@ -95,7 +95,7 @@ func main() {
 
 		params := replaceParams(step.Params, buildYAML.Vars, args)
 
-		err := bt.ExecuteStep(commander.BuildStep{Name: step.Name, Cmd: step.Cmd, Params: params})
+		_, err := bt.ExecuteStep(commander.BuildStep{Name: step.Name, Cmd: step.Cmd, Params: params})
 		if err != nil {
 			log.Fatalf("Error executing step %s: %v", step.Name, err)
 		}

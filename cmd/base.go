@@ -10,7 +10,7 @@ import (
 )
 
 // CommandHandler defines the signature for functions that handle commands.
-type CommandHandler func(params interface{}) error
+type CommandHandler func(params interface{}) (interface{}, error)
 
 // BuildTool represents a build tool instance.
 type BuildTool struct {
@@ -51,12 +51,12 @@ func NewBuildTool() *BuildTool {
 }
 
 // handleListCommands lists all available commands and their descriptions.
-func (bt *BuildTool) handleListCommands(_ interface{}) error {
+func (bt *BuildTool) handleListCommands(_ interface{}) (interface{}, error) {
 	fmt.Println("Available commands:")
 	for _, cmd := range bt.Commands {
 		fmt.Printf("%s - %s\n", cmd.Name, cmd.Help)
 	}
-	return nil
+	return nil, nil
 }
 
 // BuildStep represents a single step in the build process.
@@ -110,10 +110,10 @@ func (bt *BuildTool) UpdateVar(name string, value string) {
 }
 
 // ExecuteStep executes a single step in the build process.
-func (bt *BuildTool) ExecuteStep(step BuildStep) error {
+func (bt *BuildTool) ExecuteStep(step BuildStep) (interface{}, error) {
 	handler, ok := bt.CommandMap[step.Cmd]
 	if !ok {
-		return fmt.Errorf("unknown command: %s", step.Cmd)
+		return nil, fmt.Errorf("unknown command: %s", step.Cmd)
 	}
 
 	return handler(step.Params)

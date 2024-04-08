@@ -6,11 +6,11 @@ import (
 	"strings"
 )
 
-func (bt *BuildTool) handleRestyHTTPRequest(params interface{}) error {
+func (bt *BuildTool) handleRestyHTTPRequest(params interface{}) (interface{}, error) {
 	// Convert params to a map[string]interface{}
 	paramMap, ok := params.(map[string]interface{})
 	if !ok {
-		return fmt.Errorf("invalid params for Resty HTTP request")
+		return nil, fmt.Errorf("invalid params for Resty HTTP request")
 	}
 
 	// Create a new Resty client
@@ -63,15 +63,15 @@ func (bt *BuildTool) handleRestyHTTPRequest(params interface{}) error {
 	case "OPTIONS":
 		resp, err = req.Options(url)
 	default:
-		return fmt.Errorf("unsupported HTTP method: %s", method)
+		return nil, fmt.Errorf("unsupported HTTP method: %s", method)
 	}
 
 	if err != nil {
-		return fmt.Errorf("resty HTTP request failed: %v", err)
+		return nil, fmt.Errorf("resty HTTP request failed: %v", err)
 	}
 
 	fmt.Printf("Response status code: %d\n", resp.StatusCode())
 	fmt.Printf("Response body: %s\n", resp.String())
 
-	return nil
+	return nil, nil
 }
