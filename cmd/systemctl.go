@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func (bt *BuildTool) handleSystemctl(params interface{}) (interface{}, error) {
@@ -23,7 +24,7 @@ func (bt *BuildTool) handleSystemctlFile(params interface{}) (interface{}, error
 	restart, _ := paramMap["Restart"].(string)
 	tmpPath, _ := paramMap["tmp"].(string)
 	location, _ := paramMap["location"].(string)
-
+	name = trimNewline(name)
 	// Create a new SystemctlService instance
 	service := NewSystemctlService(name, description, execStart, restart)
 
@@ -38,10 +39,8 @@ func (bt *BuildTool) handleSystemctlFile(params interface{}) (interface{}, error
 	if err != nil {
 		return nil, fmt.Errorf("failed to move systemctl service file: %v", err)
 	}
-
-	fmt.Printf("Systemctl service file created and moved to: %s\n", filepath.Join(location, filepath.Base(serviceFilePath)))
-
-	return nil, nil
+	out := fmt.Sprintf("Systemctl service file created and moved to: %s\n", filepath.Join(location, filepath.Base(serviceFilePath)))
+	return out, nil
 }
 
 // SystemctlService represents a systemd service file.
@@ -91,4 +90,8 @@ func MoveServiceFile(serviceFilePath, destinationPath string) error {
 		return fmt.Errorf("failed to move service file: %w", err)
 	}
 	return nil
+}
+
+func trimNewline(s string) string {
+	return strings.TrimSuffix(s, "\n")
 }

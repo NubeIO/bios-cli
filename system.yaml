@@ -1,0 +1,10 @@
+shell: bash
+name: test flow document
+description: This is just a very simple example
+
+steps:
+  - name: get networking info
+    cmd: system
+    params:
+      - "ip"
+      - "uptime"

@@ -12,7 +12,6 @@ import (
 )
 
 func (bt *BuildTool) handleGitHubDownload(params interface{}) (interface{}, error) {
-	// Convert params to a map[string]interface{}
 	paramMap, ok := params.(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("invalid params for GitHub download")
@@ -27,19 +26,14 @@ func (bt *BuildTool) handleGitHubDownload(params interface{}) (interface{}, erro
 	if downloadDir == "" {
 		downloadDir = "./"
 	}
-	// Create a new Resty client
 	client := resty.New()
-
-	// Get the release information
 	resp, err := client.R().
 		SetHeader("Authorization", fmt.Sprintf("token %s", token)).
 		Get(fmt.Sprintf("https://api.github.com/repos/%s/%s/releases/tags/%s", owner, repo, tag))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get release information: %v", err)
 	}
-	fmt.Println("STATUS", resp.StatusCode())
 	if resp.StatusCode() > 300 {
-
 		return nil, fmt.Errorf("http reponse: %v", resp.String())
 	}
 
@@ -71,7 +65,7 @@ func (bt *BuildTool) handleGitHubDownload(params interface{}) (interface{}, erro
 			}
 		}
 	} else {
-		fmt.Println("No assets found in the release information")
+		return nil, fmt.Errorf("no assets found in the release information")
 	}
 
 	return nil, fmt.Errorf("no matching zip file found for architecture: %s", arch)

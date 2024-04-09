@@ -2,6 +2,7 @@ package commander
 
 import (
 	"fmt"
+	systeminfo "github.com/NubeIO/ros-bios/libs/system"
 	"gopkg.in/yaml.v3"
 
 	"os"
@@ -17,6 +18,7 @@ type BuildTool struct {
 	CommandMap map[string]CommandHandler
 	Commands   map[string]Command
 	buildYAML  BuildYAML
+	system     systeminfo.System
 }
 
 type Command struct {
@@ -27,7 +29,9 @@ type Command struct {
 
 // NewBuildTool creates a new BuildTool instance.
 func NewBuildTool() *BuildTool {
-	bt := &BuildTool{}
+	bt := &BuildTool{
+		system: systeminfo.New(),
+	}
 	bt.Commands = make(map[string]Command)
 	bt.CommandMap = map[string]CommandHandler{
 		"listCommands":    bt.handleListCommands,
@@ -38,6 +42,7 @@ func NewBuildTool() *BuildTool {
 		"dirs":            bt.handleFiles,
 		"systemctl-file":  bt.handleSystemctlFile,
 		"time":            bt.time,
+		"system":          bt.handleSystemInfo,
 	}
 	bt.Commands["listCommands"] = Command{Func: bt.handleListCommands, Name: "listCommands", Help: "List all available commands"}
 	bt.Commands["systemctl"] = Command{Func: bt.handleSystemctl, Name: "systemctl", Help: "Manage systemd services"}
@@ -45,9 +50,9 @@ func NewBuildTool() *BuildTool {
 	bt.Commands["http"] = Command{Func: bt.handleRestyHTTPRequest, Name: "http", Help: "Make an HTTP request using Resty"}
 	bt.Commands["github-download"] = Command{Func: bt.handleGitHubDownload, Name: "github-download", Help: "Download and unzip a GitHub release"}
 	bt.Commands["dirs"] = Command{Func: bt.handleFiles, Name: "dirs", Help: "Add/Edit files and dirs"}
-	bt.Commands["dirs"] = Command{Func: bt.handleFiles, Name: "dirs", Help: "Add/Edit files and dirs"}
 	bt.Commands["systemctl-file"] = Command{Func: bt.handleFiles, Name: "dirs", Help: "Generates a systemctl file"}
-	bt.Commands["time"] = Command{Func: bt.time, Name: "dirs", Help: "Generates a systemctl file"}
+	bt.Commands["time"] = Command{Func: bt.time, Name: "time", Help: "Generates a systemctl file"}
+	bt.Commands["system"] = Command{Func: bt.handleSystemInfo, Name: "system", Help: "Get host info like IP, Time"}
 
 	return bt
 }

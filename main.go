@@ -1,81 +1,17 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	commander "github.com/NubeIO/ros-bios/cmd"
-	"github.com/gin-gonic/gin"
 	"log"
-	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
-type requestBody struct {
-	File string            `json:"file"`
-	Args map[string]string `json:"args"`
-}
-
 func main() {
 	bt := commander.NewBuildTool()
-
-	if len(os.Args) > 1 && os.Args[1] == "server" {
-		// Start the Gin server
-		r := gin.Default()
-
-		// List all the YAML files
-		r.GET("/api/files", func(c *gin.Context) {
-			files, err := filepath.Glob("*.yaml")
-			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-				return
-			}
-			c.JSON(http.StatusOK, gin.H{"files": files})
-		})
-
-		// Run a YAML file
-		r.POST("/api/run", func(c *gin.Context) {
-			var request *requestBody
-			if err := c.BindJSON(&request); err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-				return
-			}
-			fmt.Println("requestBody", request)
-			buildYAML, err := bt.LoadBuildYAML(request.File)
-			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-				return
-			}
-			resp := make(map[string]interface{})
-			for i, step := range buildYAML.Steps {
-				params := replaceParams(step.Params, buildYAML.Vars, request.Args)
-				fmt.Println("params", params)
-				if ret, err := bt.ExecuteStep(commander.BuildStep{Name: step.Name, Cmd: step.Cmd, Params: params}); err != nil {
-					c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-					return
-				} else {
-					resp[fmt.Sprintf("%s_%d", step.Cmd, i)] = ret
-				}
-			}
-
-			c.JSON(http.StatusOK, gin.H{"message": resp})
-		})
-
-		// Run the server
-		if err := r.Run(); err != nil {
-			log.Fatalf("Failed to run server: %v", err)
-		}
-
-	} else if len(os.Args) < 3 {
-		fmt.Println("Usage: build-tool build build.yaml MESSAGE=hello-world")
-		_, err := bt.ExecuteStep(commander.BuildStep{Name: "listCommands", Cmd: "listCommands", Params: nil})
-		if err != nil {
-			log.Fatalf("Error executing command listCommands: %v", err)
-
-		}
-		os.Exit(1)
-	}
-
+	var resp []*response
 	command := os.Args[2]
 	if command == "listCommands" {
 		_, err := bt.ExecuteStep(commander.BuildStep{Name: "listCommands", Cmd: "listCommands", Params: nil})
@@ -85,24 +21,52 @@ func main() {
 		return
 	}
 
-	buildYAML, err := bt.LoadBuildYAML(os.Args[2])
+	buildYAML, err := bt.LoadBuildYAML(command)
 	if err != nil {
-		log.Fatalf("Error loading build YAML: %v", err)
+		out := &response{
+			File:  command,
+			Error: err.Error(),
+		}
+		resp = append(resp, out)
+		dump(resp)
+		return
 	}
 
 	args := parseArgs(os.Args[3:])
 
-	fmt.Printf("Name: %s\n", buildYAML.Name)
-	for _, step := range buildYAML.Steps {
-		fmt.Printf("Step: %s\n", step.Name)
-
+	for i, step := range buildYAML.Steps {
+		out := &response{
+			Name:      step.Name,
+			Cmd:       step.Cmd,
+			StepCount: i,
+		}
 		params := replaceParams(step.Params, buildYAML.Vars, args)
-
-		_, err := bt.ExecuteStep(commander.BuildStep{Name: step.Name, Cmd: step.Cmd, Params: params})
+		ret, err := bt.ExecuteStep(commander.BuildStep{Name: step.Name, Cmd: step.Cmd, Params: params})
 		if err != nil {
-			log.Fatalf("Error executing step %s: %v", step.Name, err)
+			out.Error = err.Error()
+		} else {
+			out.Response = ret
+			resp = append(resp, out)
 		}
 	}
+	dump(resp)
+}
+
+func dump(resp any) {
+	marshal, err := json.Marshal(resp)
+	if err != nil {
+		return
+	}
+	fmt.Println(string(marshal))
+}
+
+type response struct {
+	File      string      `json:"file,omitempty"`
+	Name      string      `json:"name,omitempty"`
+	Cmd       string      `json:"cmd,omitempty"`
+	StepCount int         `json:"stepCount,omitempty"`
+	Response  interface{} `json:"response,omitempty"`
+	Error     string      `json:"error,omitempty"`
 }
 
 func parseArgs(rawArgs []string) map[string]string {

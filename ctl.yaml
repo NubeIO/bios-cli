@@ -21,6 +21,11 @@ steps:
     params:
       - "mkdir"
       - "test"
+  - name: make a tmp dir
+    cmd: dirs
+    params:
+      - "mkdir"
+      - "test111111111"
   - name: move the file
     cmd: dirs
     params:
