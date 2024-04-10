@@ -1,18 +1,14 @@
-# ros-bios
+# BIOS CLI
 
-
-over rest
+## Over REST
 
 ```
 go run main.go server
 ```
 
+## Make a systemctl file
 
-## make a systemctl file
-
-```
-go run main.go build ctl.yaml name=driver-bacnet desc="My new service"
-```
+### Over REST
 
 ```json
 {
@@ -24,7 +20,15 @@ go run main.go build ctl.yaml name=driver-bacnet desc="My new service"
 }
 ```
 
-## download a github build
+### Over CLI
+
+```
+go run main.go build ctl.yaml name=driver-bacnet desc="My new service"
+```
+
+## Download a GitHub build
+
+### Over REST
 
 ```json
 {
@@ -40,8 +44,8 @@ go run main.go build ctl.yaml name=driver-bacnet desc="My new service"
 }
 ```
 
-over cli
+### Over CLI
 
 ```
-go run main.go build git.yaml owner=NubeIO repo=driver-bacnet tag=v1.0.0-rc.1 arch=armv7 location="./" token<TOKEN>
+go run main.go build git.yaml owner=NubeIO repo=driver-bacnet tag=v1.0.0-rc.1 arch=armv7 location=./ token=<TOKEN>
 ```
