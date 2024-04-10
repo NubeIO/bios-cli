@@ -4,11 +4,9 @@ on:
   pull_request:
     types: [ opened, synchronize, reopened, closed ]
     branches:
-      - main
       - master
   push:
     branches:
-      - main
       - master
     tags:
       - 'v*'
@@ -79,16 +77,6 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%dT%H:%M:%S')"
 
-      - name: Edit main.go for environment
-        env:
-          VERSION: ${{ needs.context.outputs.version }}
-          COMMIT: ${{ needs.context.outputs.shortCommitId }}
-          BUILD_DATE: ${{ steps.date.outputs.date }}
-        run: |
-          sed -i -e 's,<version>,'"${VERSION}"',' main.go
-          sed -i -e 's/<commit>/'"${COMMIT}"'/' main.go
-          sed -i -e 's/<build_date>/'"${BUILD_DATE}"'/' main.go
-
       - name: Build amd64
         run: |
           git config --global url."https://$GITHUB_TOKEN:x-oauth-basic@github.com/NubeIO".insteadOf "https://github.com/NubeIO"
@@ -106,10 +94,13 @@ jobs:
         if: ${{ needs.context.outputs.isRelease == 'true' }}
         run: |
           mkdir -p /tmp/zip
+          mv ./bios-cli-armv7 ./bios-cli-${{ needs.context.outputs.version }}
           artifact=${{ needs.context.outputs.fqn }}.armv7
-          zip -r /tmp/zip/$artifact.zip ./bios-cli-armv7
+          zip -r /tmp/zip/$artifact.zip ./bios-cli-${{ needs.context.outputs.version }}
+          
+          mv ./bios-cli-amd64 ./bios-cli-${{ needs.context.outputs.version }}
           artifact=${{ needs.context.outputs.fqn }}.amd64
-          zip -r /tmp/zip/$artifact.zip ./bios-cli-amd64
+          zip -r /tmp/zip/$artifact.zip ./bios-cli-${{ needs.context.outputs.version }}
 
       - name: Create Release
         if: ${{ needs.context.outputs.isRelease == 'true' }}
