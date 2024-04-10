@@ -3,7 +3,7 @@ package commands
 import (
 	"errors"
 	"fmt"
-	"github.com/NubeIO/ros-bios/libs/times"
+	"github.com/NubeIO/bios-cli/libs/times"
 
 	"regexp"
 	"strconv"

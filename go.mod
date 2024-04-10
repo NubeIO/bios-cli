@@ -1,4 +1,4 @@
-module github.com/NubeIO/ros-bios
+module github.com/NubeIO/bios-cli
 
 go 1.21.6
 

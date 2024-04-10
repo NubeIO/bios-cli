@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	commander "github.com/NubeIO/ros-bios/cmd"
+	commander "github.com/NubeIO/bios-cli/cmd"
 	"log"
 	"os"
 	"strings"

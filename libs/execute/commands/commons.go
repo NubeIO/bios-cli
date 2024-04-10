@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/NubeIO/ros-bios/libs/execute"
+	"github.com/NubeIO/bios-cli/libs/execute"
 	"regexp"
 	"strings"
 )

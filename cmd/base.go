@@ -2,7 +2,7 @@ package commander
 
 import (
 	"fmt"
-	systeminfo "github.com/NubeIO/ros-bios/libs/system"
+	systeminfo "github.com/NubeIO/bios-cli/libs/system"
 	"gopkg.in/yaml.v3"
 
 	"os"
